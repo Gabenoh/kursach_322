@@ -2,6 +2,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.filters.command import Command
 from utils import TOKEN
+from api import add_code
 import aiohttp
 import asyncio
 
@@ -54,6 +55,29 @@ async def search_command(message: types.Message):
         await message.reply_photo(photo_url)
     except:
         pass
+
+
+@dp.message(Command('add'))
+async def search_command(message: types.Message):
+    command, clas, *args = message.text.split(' ')
+    print(command, clas, *args)
+    code = await add_code(message.from_user.id, clas, *args)
+    await message.reply(code)
+
+
+@dp.message(Command('код'))
+async def search_command(message: types.Message):
+    code = await get_code()
+    await message.reply(code)
+
+
+async def get_code():
+    url = 'http://localhost:5000/api/get_code'
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data = await response.json()
+            return data.get('code')
 
 
 async def bot_run() -> None:
