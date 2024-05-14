@@ -5,7 +5,6 @@ from utils import TOKEN
 import aiohttp
 import asyncio
 
-
 dp = Dispatcher()
 
 
@@ -68,8 +67,24 @@ async def add_command(message: types.Message):
 async def code_command(message: types.Message):
     # {'id': 3, 'user': 358330105.0, 'class': 'DK', 'code': '123456'}
     code = await get_code_api()
-    await message.reply(f'Сьогодні пропонува Вам зіграти на колоді класу {code["class"]}\n'
-                        f'ось її код - {code["code"]}')
+    await message.reply(f'Сьогодні пропоную Вам зіграти на колоді класу {code["class"]}\n'
+                        f'номером {code["id"]} ось її код - {code["code"]}')
+
+
+@dp.message(Command('delete'))
+async def delete_deck(message: types.Message):
+    command, *args = message.text.split(' ')
+    index_to_delete = int(*args)  # Отримати індекс рядка, який потрібно видалити, з повідомлення користувача
+    result = await delete_row(index_to_delete)
+    await message.reply(result['message'])
+
+
+async def delete_row(index):
+    url = f'http://localhost:5000/api/delete_code/{index}'
+
+    async with aiohttp.ClientSession() as session:
+        async with session.delete(url) as response:
+            return await response.json()
 
 
 async def get_code_api():
