@@ -2,7 +2,6 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.filters.command import Command
 from utils import TOKEN
-from api import add_code
 import aiohttp
 import asyncio
 
@@ -58,24 +57,35 @@ async def search_command(message: types.Message):
 
 
 @dp.message(Command('add'))
-async def search_command(message: types.Message):
+async def add_command(message: types.Message):
     command, clas, *args = message.text.split(' ')
     print(command, clas, *args)
-    code = await add_code(message.from_user.id, clas, *args)
+    await post_code_api(message.from_user.id, clas, *args)
+    await message.reply('Вашу колоду додано')
+
+
+@dp.message(Command('code'))
+async def code_command(message: types.Message):
+    code = await get_code_api()
     await message.reply(code)
 
 
-@dp.message(Command('код'))
-async def search_command(message: types.Message):
-    code = await get_code()
-    await message.reply(code)
-
-
-async def get_code():
+async def get_code_api():
     url = 'http://localhost:5000/api/get_code'
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as response:
+            data = await response.json()
+            print(data)
+            return data
+
+
+async def post_code_api(user_id, clas, code):
+    url = 'http://localhost:5000/api/post_code'
+    data = {'user_id': user_id, 'class': clas, 'code': code}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=data) as response:
             data = await response.json()
             return data.get('code')
 
