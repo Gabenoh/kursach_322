@@ -66,8 +66,10 @@ async def add_command(message: types.Message):
 
 @dp.message(Command('code'))
 async def code_command(message: types.Message):
+    # {'id': 3, 'user': 358330105.0, 'class': 'DK', 'code': '123456'}
     code = await get_code_api()
-    await message.reply(code)
+    await message.reply(f'Сьогодні пропонува Вам зіграти на колоді класу {code["class"]}\n'
+                        f'ось її код - {code["code"]}')
 
 
 async def get_code_api():
