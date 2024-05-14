@@ -1,4 +1,3 @@
-from flask import Flask, jsonify
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart
 from aiogram.filters.command import Command
@@ -6,20 +5,8 @@ from utils import TOKEN
 import aiohttp
 import asyncio
 
-app = Flask(__name__)
+
 dp = Dispatcher()
-
-
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    data = {'message': 'Привіт, це мій перший API!'}
-    return jsonify(data)
-
-
-@app.route('/data/', methods=['GET'])
-def data_get():
-    data = {'message': 'Привіт, це мій перший API!'}
-    return jsonify(data)
 
 
 async def get_card(name):
@@ -70,18 +57,10 @@ async def search_command(message: types.Message):
 
 
 async def bot_run() -> None:
-    # Initialize Bot instance with default bot properties which will be passed to all API calls
     bot = Bot(token=TOKEN)
-    # And the run events dispatching
+    print('bot start')
     await dp.start_polling(bot)
 
 
-# async def main_aio():
-#     data = await get_card('Лирой Дженкинс')
-#     print(data)
-
-
 if __name__ == '__main__':
-    # asyncio.run(main_aio())
     asyncio.run(bot_run())
-    app.run(debug=True)
