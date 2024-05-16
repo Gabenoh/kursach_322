@@ -46,7 +46,7 @@ async def search(message: types.Message):
         await message.reply(f'Карти {search_query} не знайдено')
 
 
-@dp.message(Command('search'))
+@dp.message(Command('search', "пошук"))
 async def search_command(message: types.Message):
     photo_url = await search(message)
     try:
@@ -55,7 +55,7 @@ async def search_command(message: types.Message):
         pass
 
 
-@dp.message(Command('add'))
+@dp.message(Command('add', 'додай'))
 async def add_command(message: types.Message):
     command, clas, *args = message.text.split(' ')
     print(command, clas, *args)
@@ -63,14 +63,14 @@ async def add_command(message: types.Message):
     await message.reply('Вашу колоду додано')
 
 
-@dp.message(Command('all'))
+@dp.message(Command('all', "всі"))
 async def add_command(message: types.Message):
     deck_list = await all_code_api()
     for row in deck_list:
         await message.reply(f'№{row[0]}, class {row[2]}, \n code - {row[3]}')
 
 
-@dp.message(Command('help'))
+@dp.message(Command('help', "допомога"))
 async def help_command(message: types.Message):
     await message.reply(f'Мої команди:\n'
                         f'/help - виведення підказки по командам\n'
@@ -83,7 +83,7 @@ async def help_command(message: types.Message):
                         f'/search - пошук карти у зовнішньому API')
 
 
-@dp.message(Command('random_deck'))
+@dp.message(Command('random_deck', "випадкова_колода"))
 async def code_command(message: types.Message):
     # {'id': 3, 'user': 358330105.0, 'class': 'DK', 'code': '123456'}
     code = await get_code_api()
@@ -91,7 +91,7 @@ async def code_command(message: types.Message):
                         f'номером {code[0]} ось її код - {code[3]}')
 
 
-@dp.message(Command('delete'))
+@dp.message(Command('delete', "видали"))
 async def delete_deck(message: types.Message):
     command, *args = message.text.split(' ')
     index_to_delete = int(*args)  # Отримати індекс рядка, який потрібно видалити, з повідомлення користувача
@@ -99,7 +99,7 @@ async def delete_deck(message: types.Message):
     await message.reply(result['message'])
 
 
-@dp.message(Command('update'))
+@dp.message(Command('update', "онови"))
 async def update_deck(message: types.Message):
     command, *args = message.text.split(' ')
     index_to_update = int(args[0])  # Отримати індекс рядка, який потрібно оновити, з повідомлення користувача
