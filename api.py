@@ -1,59 +1,53 @@
 from flask import Flask, jsonify, request
 # from flask_sqlalchemy import SQLAlchemy
-import pandas as pd
-import random as rd
-
-# import aiohttp
+from db import *
 
 
 app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:password@localhost/mysql'
-# db = SQLAlchemy(app)
-
-
-data = pd.read_csv('./data/data.csv')
-
-
-# class Code(db.Model):
-#     __tablename__ = 'code'
-#     id = db.Column(db.Integer, primary_key=True)
-#     user_id = db.Column(db.Integer)
-#     clas = db.Column(db.String(255))
-#     code = db.Column(db.String(255))
-
-
-def add_deck(user, clas, code):
-    print(user, clas, code)
-    new_row = {'id': len(data), 'user': user, 'class': clas, 'code': code}
-    data.loc[len(data)+1] = new_row
-    data.to_csv('./data/data.csv', index=False)
 
 
 @app.route('/api/get_code', methods=['GET'])
 def get_code():
-    index = rd.randint(0, len(data) - 1)
-    first_row = data.iloc[index].to_dict()
-    first_row['id'] = index
-    return jsonify(first_row)
+    id, user, clas, code = get_random_deck()
+    return jsonify(id, user, clas, code)
+
+
+@app.route('/api/get_all_code', methods=['GET'])
+def get_all_code():
+    all_deck_list = get_all_deck()
+    print(all_deck_list)
+    print(jsonify(all_deck_list))
+    return jsonify(all_deck_list)
 
 
 @app.route('/api/post_code', methods=['POST'])
 def post_code():
-    user_id = request.json.get('user_id')
-    clas = request.json.get('class')
+    user_id = request.json.get('user')
+    clas = request.json.get('clas')
     code = request.json.get('code')
     add_deck(user_id, clas, code)
     return jsonify({'message': 'Code added successfully'}), 201
 
 
 @app.route('/api/delete_code/<int:index>', methods=['DELETE'])
-def delete_deck(index):
+def delete_deck_api(index):
     try:
-        data.drop(index, inplace=True)
-        data.to_csv('./data/data.csv', index=False)
+        delete_deck(index)
         return jsonify({'message': 'Колоду успішно видалено'}), 200
     except KeyError:
         return jsonify({'message': 'Колоду не знайдено'}), 404
+
+
+# Оновлення існуючого рядка (UPDATE)
+@app.route('/update_user/<int:row_id>', methods=['PUT'])
+def update_deck_api(row_id):
+    clas = request.json.get('clas')
+    code = request.json.get('code')
+    try:
+        update_deck(row_id, clas, code)
+        return jsonify({'message': 'User updated successfully'}), 200
+    except:
+        return jsonify({'message': 'User not found'}), 404
 
 
 if __name__ == '__main__':

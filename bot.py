@@ -46,7 +46,7 @@ async def search(message: types.Message):
         await message.reply(f'Карти {search_query} не знайдено')
 
 
-@dp.message(Command('пошук'))
+@dp.message(Command('search'))
 async def search_command(message: types.Message):
     photo_url = await search(message)
     try:
@@ -63,12 +63,32 @@ async def add_command(message: types.Message):
     await message.reply('Вашу колоду додано')
 
 
-@dp.message(Command('code'))
+@dp.message(Command('all'))
+async def add_command(message: types.Message):
+    deck_list = await all_code_api()
+    for row in deck_list:
+        await message.reply(f'№{row[0]}, class {row[2]}, \n code - {row[3]}')
+
+
+@dp.message(Command('help'))
+async def help_command(message: types.Message):
+    await message.reply(f'Мої команди:\n'
+                        f'/help - виведення підказки по командам\n'
+                        f'/random_deck - виведення випадкової колоди з бази даних\n'
+                        f'/add - додавання колоди до списку (/add Клас Код_колоди\n'
+                        f'/all - виведення всіх колод які є у базі даних\n'
+                        f'/update - оновлення колоди у списку\n'
+                        f'(/update id_колоди Клас Код_колоди)\n'
+                        f'/delete - видалення колоди по індексу\n'
+                        f'/search - пошук карти у зовнішньому API')
+
+
+@dp.message(Command('random_deck'))
 async def code_command(message: types.Message):
     # {'id': 3, 'user': 358330105.0, 'class': 'DK', 'code': '123456'}
     code = await get_code_api()
-    await message.reply(f'Сьогодні пропоную Вам зіграти на колоді класу {code["class"]}\n'
-                        f'номером {code["id"]} ось її код - {code["code"]}')
+    await message.reply(f'Сьогодні пропоную Вам зіграти на колоді класу {code[2]}\n'
+                        f'номером {code[0]} ось її код - {code[3]}')
 
 
 @dp.message(Command('delete'))
@@ -77,6 +97,15 @@ async def delete_deck(message: types.Message):
     index_to_delete = int(*args)  # Отримати індекс рядка, який потрібно видалити, з повідомлення користувача
     result = await delete_row(index_to_delete)
     await message.reply(result['message'])
+
+
+@dp.message(Command('update'))
+async def update_deck(message: types.Message):
+    command, *args = message.text.split(' ')
+    index_to_update = int(args[0])  # Отримати індекс рядка, який потрібно оновити, з повідомлення користувача
+    print(index_to_update, args[1], args[2])
+    result = await update_user(index_to_update, args[1], args[2])
+    await message.reply(result)
 
 
 async def delete_row(index):
@@ -97,14 +126,36 @@ async def get_code_api():
             return data
 
 
-async def post_code_api(user_id, clas, code):
+async def all_code_api():
+    url = 'http://localhost:5000/api/get_all_code'
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data = await response.json()
+            print(data)
+            return data
+
+
+async def post_code_api(user, clas, code):
     url = 'http://localhost:5000/api/post_code'
-    data = {'user_id': user_id, 'class': clas, 'code': code}
+    data = {'user': user, 'clas': clas, 'code': code}
 
     async with aiohttp.ClientSession() as session:
         async with session.post(url, json=data) as response:
             data = await response.json()
             return data.get('code')
+
+
+async def update_user(row_id, clas, code):
+    url = f'http://127.0.0.1:5000/update_user/{row_id}'
+    data = {'clas': clas, 'code': code}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.put(url, json=data) as response:
+            if response.status == 200:
+                return "Колода успішно відредагована"
+            else:
+                return "Помилка при оновлені колоди"
 
 
 async def bot_run() -> None:
