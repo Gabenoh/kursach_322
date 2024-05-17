@@ -1,14 +1,26 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from db import *
 
 
 app = Flask(__name__)
 
 
+# Головна сторінка
+@app.route('/')
+def home():
+    return render_template('main/index.html')
+
+
 @app.route('/api/get_code', methods=['GET'])
 def get_code():
     id, user, clas, code = get_random_deck()
-    return jsonify(id, user, clas, code)
+    return jsonify(id=id, user=user, clas=clas, code=code)
+
+
+@app.route('/api/get_random', methods=['GET'])
+def get_random():
+    id, user, clas, code = get_random_deck()
+    return render_template('get_code/index.html', id=id, user=user, clas=clas, code=code)
 
 
 @app.route('/api/get_all_code', methods=['GET'])

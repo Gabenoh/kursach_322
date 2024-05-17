@@ -1,0 +1,37 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+    padding: 50px;
+}
+
+h1 {
+    color: #007acc;
+    font-size: 2.5em;
+    margin-bottom: 30px;
+}
+
+.deck-code {
+    font-size: 1.8em;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.get-another {
+    display: inline-block;
+    padding: 20px 40px; /* Збільшуємо внутрішні відступи кнопки */
+    font-size: 1.2em;
+    color: white;
+    background-color: #007acc;
+    border: 2px solid #007acc;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; /* Анімація при наведенні */
+}
+
+.get-another:hover {
+    background-color: #005f99;
+    border-color: #005f99; /* Зміна кольору межі при наведенні */

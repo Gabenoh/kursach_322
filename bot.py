@@ -87,8 +87,8 @@ async def help_command(message: types.Message):
 async def code_command(message: types.Message):
     # {'id': 3, 'user': 358330105.0, 'class': 'DK', 'code': '123456'}
     code = await get_code_api()
-    await message.reply(f'Сьогодні пропоную Вам зіграти на колоді класу {code[2]}\n'
-                        f'номером {code[0]} ось її код - {code[3]}')
+    await message.reply(f'Сьогодні пропоную Вам зіграти на колоді класу {code["clas"]}\n'
+                        f'номером {code["id"]} ось її код - {code["code"]}')
 
 
 @dp.message(Command('delete', "видали"))

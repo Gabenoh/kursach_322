@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Deck Code</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- Підключення зовнішнього CSS-файлу -->
+
+</head>
+<body>
+    <h1>Random Deck Code</h1>
+    <div class="deck-code">
+        <p>Here is your random deck code:</p>
+        <code id="deckCode"></code>
+    </div>
+    <button class="get-another" onclick="getNewDeck()">Get Another</button>
+    <script>
+        function getNewDeck() {
+            fetch('/api/get_code') // Виконати запит на сервер
+            .then(response => response.json()) // Перетворити відповідь на JSON
+            .then(data => { // Обробити отримані дані
+                const deckCodeElement = document.getElementById('deckCode');
+                deckCodeElement.textContent = data.code; // Оновити текст в елементі з кодом колоди
+            })
+            .catch(error => console.error('Error fetching new deck:', error));
+        }
+    </script>
+</body>
+</html>
